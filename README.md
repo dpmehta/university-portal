@@ -43,7 +43,7 @@ To run this project locally, follow these steps:
 4. **Configure the database**:
     - Create a MySQL database.
     - Import the provided `database.sql` file to set up the necessary tables.
-    - Update the database connection details in the `config.php` file.
+    - Update the database connection details in the `dbconnection.php` file.
 
 
 ## Usage
