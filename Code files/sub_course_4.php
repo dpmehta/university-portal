@@ -11,7 +11,7 @@
 
     <link href="css/style.css" rel="stylesheet">
   <style>
-    /* Table styling */
+    
     body{
         font-size: 18px;
     }
@@ -34,7 +34,7 @@
     tr:nth-child(even) {
       background-color: #f2f2f2;
     }
-    /* Input styling */
+   
     input[type="text"], select {
       padding: 6px 10px;
       border: none;
@@ -53,7 +53,7 @@
   </style>
 </head>
 <body>
-      <!-- Topbar Start -->
+      
       <div class="container-fluid d-none d-lg-block">
         <div class="row align-items-center py-4 px-xl-5">
             <div class="col-lg-3">
@@ -90,10 +90,7 @@
             </div>
         </div>
     </div>
-    <!-- Topbar End -->
-
-
-    <!-- Navbar Start -->
+  
     <div class="container-fluid">
         <div class="row border-top px-xl-5">
           <div class="col-lg-3 d-none d-lg-block">
@@ -124,7 +121,7 @@
             </div>
         </div>
     </div>
-    <!-- Navbar End -->
+    
 
 
   <br><br><br>
