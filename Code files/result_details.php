@@ -61,40 +61,51 @@
           <div class="card-header bg-transparent text-center">
             <img class="profile_img" src="https://source.unsplash.com/600x300/?student" alt="student dp">
             <?php
-
               $servername = "localhost";
               $username = "root";
               $password = "";
               $dbname = "portal";
 
-              $pdo = new PDO("mysql:host=localhost; dbname=portal","root","");
-              $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-              if (isset($_POST["un"])) {
-                // Get the value of the "username" field
-                $username = $_POST["un"];}
+              try {
+                 
+                  $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-              $sql = "SELECT r.grno, r.spi, r.remarks, r.sem,r.backlog, s.studname, s.studemail,s.academic
-              FROM result r
-              INNER JOIN student s
-              ON r.grno = s.grno 
-              where r.grno = 121113
-              ";
-                  $result = $pdo->query($sql);
-                  if ($result->rowCount() > 0) {
-                      $row = $result->fetch(PDO::FETCH_ASSOC);
-                      $studname = $row['studname'];
-                      $grno = $row['grno'];
-                      $studemail = $row['studemail'];
-                      $spi=$row['spi'];
-                      $remarks=$row['remarks'];
-                      $semester=$row['sem'];
-                      $backlog=$row['backlog'];
-                      $academic=$row['academic'];
+                  if (isset($_POST['un'])) {
+                     
+                      $username = htmlspecialchars($_POST['un']);
+
                       
-                  } else {
-                      echo "0 results";
+                      $sql = "SELECT r.grno, r.spi, r.remarks, r.sem, r.backlog, s.studname, s.studemail, s.academic
+                              FROM result r
+                              INNER JOIN student s ON r.grno = s.grno
+                              WHERE r.grno = :grno";
+
+                   
+                      $stmt = $pdo->prepare($sql);
+                      $stmt->bindParam(':grno', $username, PDO::PARAM_INT);
+                      $stmt->execute();
+
+                     
+                      if ($stmt->rowCount() > 0) {
+                          $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                          $studname = htmlspecialchars($row['studname']);
+                          $grno = htmlspecialchars($row['grno']);
+                          $studemail = htmlspecialchars($row['studemail']);
+                          $spi = htmlspecialchars($row['spi']);
+                          $remarks = htmlspecialchars($row['remarks']);
+                          $semester = htmlspecialchars($row['sem']);
+                          $backlog = htmlspecialchars($row['backlog']);
+                          $academic = htmlspecialchars($row['academic']);
+                      } else {
+                          echo "0 results";
+                      }
                   }
-              ?>
+              } catch (PDOException $e) {
+                  echo "Connection failed: " . htmlspecialchars($e->getMessage());
+              }
+            ?>
+
             <h3><?php echo $studname; ?></h3>
           </div>
           <div class="card-body">
