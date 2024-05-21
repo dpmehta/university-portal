@@ -1,78 +1,70 @@
 
 <?php
-try{
-    $pdo = new PDO("mysql:host=localhost; dbname=portal","root","");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-   if(isset($_REQUEST['login']))
-   {
-       $sql = "SELECT * FROM login WHERE studemail=:u_uname AND password=:u_pwd";
-       $res = $pdo->prepare($sql);
-       $res->bindParam(':u_uname',$_REQUEST['un']);
-       $res->bindParam(':u_pwd',$_REQUEST['ps']);
-       $res->execute();
-       if($res->rowCount()==1)
-       { 
-           header("location:index.php");
-       }
-       else
-       {
-           echo '<script type ="text/JavaScript">';  
-           echo 'alert("Username and Password is Invalid")';  
-           echo '</script>';  
-       }
-   }
+$pdo = new PDO("mysql:host=localhost; dbname=portal", "root", "");
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+if (isset($_REQUEST['login'])) {
+  $sql = "SELECT * FROM login WHERE studemail=:username AND password=:password";
+  $res = $pdo->prepare($sql);
+  $res->bindParam(':username', $_REQUEST['un']);
+  $res->bindParam(':password', $_REQUEST['ps']);
+  $res->execute();
+
+  if ($res->rowCount() === 1) {
+    header("location:index.php");
+  } else {
+    echo '<script type="text/JavaScript">alert("Invalid Username or Password")</script>';
+  }
 }
-   catch(PDOException $e1){}
+
+catch (PDOException $e1) {}
 ?>
+
 
 <?php
 
-if($_SERVER['REQUEST_METHOD'] == "POST") {
-    require_once "dbconnection.php";
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+  require_once "dbconnection.php";
 
-    if(empty($_POST['studname']) || empty($_POST['studphno']) || empty($_POST['studgen']) || empty($_POST['studbdate']) || empty($_POST['studcourse']) || empty($_POST['studemail'])||empty($_POST['grno'])) {
-        echo "Please fill in all required fields";
-    } else {
-        $sql = "insert into student(studname,studphno,studgen,studbdate,studcourse,studemail,grno) values(:studname,:studphno,:studgen,:studbdate,:studcourse,:studemail,:grno)";
-        $rev = "insert into login (studemail,password) values(:studemail,:password)";
-        
-        $res1 = $pdo->prepare($rev);
+  $requiredFields = ["studname", "studphno", "studgen", "studbdate", "studcourse", "studemail", "grno"];
+  $missingFields = array_diff_key($_POST, array_flip($requiredFields)); // Check for missing fields
 
-        $res = $pdo->prepare($sql);
-        
-        $res->bindParam(':studname', $_POST['studname']);
-        $res->bindParam(':studphno', $_POST['studphno']);
-        $res->bindParam(':studgen', $_POST['studgen']);
-        $res->bindParam(':studbdate', $_POST['studbdate']);
-        $res->bindParam(':studcourse', $_POST['studcourse']);
-        $res->bindParam(':grno', $_POST['grno']);
-        $res->bindParam(':studemail', $_POST['studemail']);
-        $res1->bindParam(':studemail', $_POST['studemail']);
-        $res1->bindParam(':password',$_POST['password']);
-        
-         
-        // execute prepare statement
-        if($res->execute()) {
-            echo "Data Inserted :)";
-            header("location:index.php?msg=Data Inserted!");
-            if($res1->execute()) {
-                echo "Data Inserted into login:)";
-                header("location:index.php?msg=Data Inserted!");
-            } else {
-                $error = $res1->errorInfo();
-                echo "Error inserting data into login: ".$error[2];
-            }
-        } else {
-            $error = $res->errorInfo();
-            echo "Error inserting data: ".$error[2];
-        }
+  if (!empty($missingFields)) {
+    echo "Please fill in all required fields: " . implode(", ", array_keys($missingFields));
+  } else {
+    $sql = "INSERT INTO student (studname, studphno, studgen, studbdate, studcourse, studemail, grno) 
+            VALUES (:studname, :studphno, :studgen, :studbdate, :studcourse, :studemail, :grno)";
+    $rev = "INSERT INTO login (studemail, password) VALUES (:studemail, :password)";
 
-        // close connection
-        unset($pdo);
+    $res = $pdo->prepare($sql);
+    $res1 = $pdo->prepare($rev);
+
+    
+    foreach ($_POST as $key => $value) {
+      $res->bindParam(":$key", $value);
+      if ($key != "password") { 
+        $res1->bindParam(":$key", $value);
+      }
     }
+
+    if ($res->execute()) {
+      echo "Data Inserted into student :)";
+      header("location:index.php?msg=Data Inserted!");
+      if ($res1->execute()) {
+        echo "Data Inserted into login :)";
+      } else {
+        $error = $res1->errorInfo();
+        echo "Error inserting data into login: " . $error[2];
+      }
+    } else {
+      $error = $res->errorInfo();
+      echo "Error inserting data into student: " . $error[2];
+    }
+
+    unset($pdo); 
+  }
 }
 ?>
-
 
 
 <!DOCTYPE html>
