@@ -11,7 +11,7 @@
 
     <link href="css/style.css" rel="stylesheet">
   <style>
-    /* Table styling */
+  
     body{
         font-size: 18px;
     }
@@ -53,7 +53,7 @@
   </style>
 </head>
 <body>
-      <!-- Topbar Start -->
+    
       <div class="container-fluid d-none d-lg-block">
         <div class="row align-items-center py-4 px-xl-5">
             <div class="col-lg-3">
@@ -91,10 +91,7 @@
         
         </div>
     </div>
-    <!-- Topbar End -->
-
-
-    <!-- Navbar Start -->
+   
     <div class="container-fluid">
         <div class="row border-top px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
