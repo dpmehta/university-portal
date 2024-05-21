@@ -137,22 +137,48 @@
     </thead>
     <tbody>
     <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "portal";
-      $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-      $stmt = $conn->prepare("SELECT course_name, course_code, no_of_seats FROM course WHERE department = 'BBA'");
-      $stmt->execute();
 
-      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo "<tr>";
-        echo "<td>" . $row['course_name'] . "</td>";
-        echo "<td>" . $row['course_code'] . "</td>";
-        echo "<td>" . $row['no_of_seats'] . "</td>";
-        echo "</tr>";
-      }
-    ?>
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "portal";
+$department = "BBA"; 
+
+try {
+  $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+  $sql = "SELECT course_name, course_code, no_of_seats FROM course WHERE department = :department";
+  $stmt = $conn->prepare($sql);
+
+  $stmt->bindParam(':department', $department);
+
+  $stmt->execute();
+
+  $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($courses) {
+    foreach ($courses as $row) {
+      echo "<tr>";
+      echo "<td>" . $row['course_name'] . "</td>";
+      echo "<td>" . $row['course_code'] . "</td>";
+      echo "<td>" . $row['no_of_seats'] . "</td>";
+      echo "</tr>";
+    }
+  } else {
+    echo "<tr><td colspan='3'>No courses found for $department</td></tr>";
+  }
+
+} catch(PDOException $e) {
+  echo "Error: " . $e->getMessage();
+} finally {
+  if ($conn) {
+    $conn = null;
+  }
+}
+
+?>
+
   </tbody>
 </table><br>
 <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(256, 256, 256, .1) !important;">
