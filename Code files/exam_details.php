@@ -16,7 +16,6 @@
         background-color: #ddd;
       }
 		nav {
-			/*background-color:cornflowerblue;*/
 			overflow: hidden;
       font-size: 20px;
 		}
@@ -69,33 +68,51 @@
           <div class="card-header bg-transparent text-center">
             <img class="profile_img" src="https://source.unsplash.com/600x300/?student" alt="student dp">
             <?php
+              $servername = "localhost";
+              $username = "root";
+              $password = "";
+              $dbname = "portal";
 
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "portal";
+              try {
+                  $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                $pdo = new PDO("mysql:host=localhost; dbname=portal","root","");
-                // $stmt = $conn->prepare("SELECT examSubject,classNumber,blockNo,date_exam,examType,studname,grno FROM examdetails e join student s");
-                // $stmt->execute();
-                $sql = "SELECT examSubject,classNumber,blockNo,date_exam,examType,studname,grno FROM examdetails e inner join student s 
-                where s.grno = 121113";
-                    $result = $pdo->query($sql);
-                    if ($result->rowCount() > 0) {
-                        $row = $result->fetch(PDO::FETCH_ASSOC);
-                        $examSubject = $row['examSubject'];
-                        $classNumber = $row['classNumber'];
-                        $blockNo = $row['blockNo'];
-                        $date_exam = $row['date_exam'];
-                        $examType = $row['examType'];
-                        $studname = $row['studname'];
-                        $grno = $row['grno'];
-                    } else {
-                        echo "0 results";
-                    }
-                    
-             ?>
-             <?php
+                 
+                  $sql = "SELECT 
+                              e.examSubject,
+                              e.classNumber,
+                              e.blockNo,
+                              e.date_exam,
+                              e.examType,
+                              s.studname,
+                              s.grno 
+                          FROM examdetails e 
+                          INNER JOIN student s ON s.grno = 121113";
+
+                 
+                  $stmt = $pdo->query($sql);
+
+                 
+                  if ($stmt->rowCount() > 0) {
+                      
+                      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                      $examSubject = htmlspecialchars($row['examSubject']);
+                      $classNumber = htmlspecialchars($row['classNumber']);
+                      $blockNo = htmlspecialchars($row['blockNo']);
+                      $date_exam = htmlspecialchars($row['date_exam']);
+                      $examType = htmlspecialchars($row['examType']);
+                      $studname = htmlspecialchars($row['studname']);
+                      $grno = htmlspecialchars($row['grno']);
+                  } else {
+                      echo "0 results";
+                  }
+              } catch (PDOException $e) {
+                  echo "Connection failed: " . $e->getMessage();
+              } finally {
+                  $pdo = null; 
+              }
+            ?>
+
             echo "<h3>".$row['studname']."</h3>"?>
           </div>
           <div class="card-body">
