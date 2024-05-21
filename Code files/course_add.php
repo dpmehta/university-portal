@@ -5,50 +5,44 @@ $password = "";
 $dbname = "portal";
 
 try {
-  $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-  if(isset($_POST['submit'])) {
-    $course_name = $_POST['course_name'];
-    $course_code = $_POST['course_code'];
-    $no_of_seats = $_POST['no_of_seats'];
-    $no_of_faculties = $_POST['no_of_faculties'];
-    $department= $_POST['department'];
-    
+    if (isset($_POST['submit'])) {
+        $course_name = trim($_POST['course_name']);
+        $course_code = trim($_POST['course_code']);
+        $no_of_seats = trim($_POST['no_of_seats']);
+        $no_of_faculties = trim($_POST['no_of_faculties']);
+        $department = trim($_POST['department']);
 
-
-    if(empty($course_name) || empty($course_code) || empty($no_of_seats) || empty($no_of_faculties) ||empty($department)){
-        echo "Please fill all the fields";
-    }
-    else{
-        $sql = "INSERT INTO course (course_name, course_code, no_of_seats, no_of_faculties,department) VALUES (:course_name, :course_code, :no_of_seats, :no_of_faculties,:department)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':course_name', $course_name);
-        $stmt->bindParam(':course_code', $course_code);
-        $stmt->bindParam(':no_of_seats', $no_of_seats);
-        $stmt->bindParam(':department', $department);
-        $stmt->bindParam(':no_of_faculties', $no_of_faculties);
-        $stmt->execute();
-
-        if ($stmt->rowCount()) {
-            echo '<script type ="text/JavaScript">';  
-            echo 'alert("Course Added")';  
-            echo '</script>'; 
-            // header('location:courses.php') ;
+        if (empty($course_name) || empty($course_code) || empty($no_of_seats) || empty($no_of_faculties) || empty($department)) {
+            echo "Please fill all the fields";
         } else {
-            echo "Failed to submit the form";
+            $sql = "INSERT INTO course (course_name, course_code, no_of_seats, no_of_faculties, department) 
+                    VALUES (:course_name, :course_code, :no_of_seats, :no_of_faculties, :department)";
+            $stmt = $conn->prepare($sql);
+
+            $stmt->bindParam(':course_name', $course_name);
+            $stmt->bindParam(':course_code', $course_code);
+            $stmt->bindParam(':no_of_seats', $no_of_seats, PDO::PARAM_INT);
+            $stmt->bindParam(':no_of_faculties', $no_of_faculties, PDO::PARAM_INT);
+            $stmt->bindParam(':department', $department);
+
+            if ($stmt->execute()) {
+                echo '<script type="text/javascript">alert("Course Added");</script>';
+                header('Location: courses.php');
+            } else {
+                echo "Failed to submit the form";
+            }
         }
-
     }
-
-    
-  }
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+} finally {
+    $conn = null;
 }
-catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
-}
-$conn = null;
 ?>
+
 
 <!DOCTYPE html>
 <html>
