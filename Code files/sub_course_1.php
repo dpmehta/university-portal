@@ -130,22 +130,37 @@
     </thead>
     <tbody>
     <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "portal";
-      $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-      $stmt = $conn->prepare("SELECT course_name, course_code, no_of_seats FROM course WHERE department = 'BE/BTech'");
-      $stmt->execute();
+      $servername = "localhost";
+      $username = "root";
+      $password = "";
+      $dbname = "portal";
 
-      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo "<tr>";
-        echo "<td>" . $row['course_name'] . "</td>";
-        echo "<td>" . $row['course_code'] . "</td>";
-        echo "<td>" . $row['no_of_seats'] . "</td>";
-        echo "</tr>";
+      try {
+          $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+          $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+         
+          $stmt = $conn->prepare("SELECT course_name, course_code, no_of_seats FROM course WHERE department = :department");
+          $department = 'BE/BTech';
+          $stmt->bindParam(':department', $department, PDO::PARAM_STR);
+          
+         
+          $stmt->execute();
+
+         
+          while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+              echo "<tr>";
+              echo "<td>" . htmlspecialchars($row['course_name']) . "</td>";
+              echo "<td>" . htmlspecialchars($row['course_code']) . "</td>";
+              echo "<td>" . htmlspecialchars($row['no_of_seats']) . "</td>";
+              echo "</tr>";
+          }
+      } catch (PDOException $e) {
+          // Handle the error
+          echo "Connection failed: " . htmlspecialchars($e->getMessage());
       }
     ?>
+
   </tbody>
 </table><br>
 <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(256, 256, 256, .1) !important;">
