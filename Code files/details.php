@@ -57,7 +57,7 @@
     <div class="rt-container">
         <div class="col-rt-4" id="float-right">
  
-            <!-- Ad Here -->
+            
             
         </div>
     </div>
@@ -87,47 +87,42 @@
           <div class="card-header bg-transparent text-center">
             <img class="profile_img" src="https://source.unsplash.com/600x300/?student" alt="student dp">
             <?php
- 
-  $servername = "localhost";
-  $username = "root";
-  $password = "";
-  $dbname = "portal";
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  
-  // Check connection
-  if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
-  
-  if (isset($_POST["un"])) {
-    // Get the value of the "username" field
-    $username = $_POST["un"];
-  // Prepare a SQL query to retrieve the student data
-  $stmt = $conn->prepare("SELECT * FROM student WHERE studemail = ?");
-  $stmt->bind_param("s", $username);
-  $stmt->execute();
-  
-  
-  // Get the results of the SQL query
-  $result = $stmt->get_result();
-  
-  // Check if a row was found
-  if ($result->num_rows > 0) {
-    // Loop through the rows and display the student data
-    while($row = $result->fetch_assoc()) {
-      echo '<br>';
-      echo "<h3>" . $row["studname"] . "</h3><br>";
-      echo "Email: " . $row["studemail"] . "<br>";
-      // Add more fields here as needed
+
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "portal";
+
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
     }
-  } else {
-    echo "No student data found for username: " . $username;
-  }
-  
-  // Close the database connection
-  $stmt->close();
-  $conn->close();
-}
+
+    if (isset($_POST["un"])) {
+        $username = trim($_POST["un"]); 
+
+        $stmt = $conn->prepare("SELECT studname, studemail FROM student WHERE studemail = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo '<br>';
+                echo "<h3>" . htmlspecialchars($row["studname"]) . "</h3><br>"; // Use htmlspecialchars to prevent XSS
+                echo "Email: " . htmlspecialchars($row["studemail"]) . "<br>";
+            }
+        } else {
+            echo "No student data found for username: " . htmlspecialchars($username); // Use htmlspecialchars to prevent XSS
+        }
+
+        $stmt->close();
+    }
+
+    $conn->close();
+
 ?>           
           </div>
         </div>
