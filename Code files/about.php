@@ -99,7 +99,7 @@
                 <div class="col-lg-7">
                     <div class="text-left mb-4">
                         <h1 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;">About Us</h1>
-                        <!-- <h1>Innovative Way To Learn</h1> -->
+                        
                     </div>
                     <p><b>AcademySite</b> is a top provider of education and training in many fields.  
                         Our experienced faculty and flexible, student-centered approach to education ensure that our students have the resources they need to succeed. 

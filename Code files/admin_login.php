@@ -1,77 +1,78 @@
-
 <?php
-try{
-    $pdo = new PDO("mysql:host=localhost; dbname=portal","root","");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-   if(isset($_REQUEST['login']))
-   {
-       $sql = "SELECT * FROM admin WHERE username=:u_uname AND password=:u_pwd";
-       $res = $pdo->prepare($sql);
-       $res->bindParam(':u_uname',$_REQUEST['un']);
-       $res->bindParam(':u_pwd',$_REQUEST['ps']);
-       $res->execute();
-       if($res->rowCount()==1)
-       { 
-           header("location:index2.php");
-       }
-       else
-       {
-           echo '<script type ="text/JavaScript">';  
-           echo 'alert("Username and Password is Invalid")';  
-           echo '</script>';  
-       }
-   }
+try {
+    $pdo = new PDO("mysql:host=localhost; dbname=portal", "root", "");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
 }
-   catch(PDOException $e1){}
-?>
 
-<?php
 
-if($_SERVER['REQUEST_METHOD'] == "POST") {
-    require_once "dbconnection.php";
-
-    // Server-side validation to check required fields
-    if(empty($_POST['studname']) || empty($_POST['studphno']) || empty($_POST['studgen']) || empty($_POST['studbdate']) || empty($_POST['studcourse']) || empty($_POST['studemail'])||empty($_POST['grno'])) {
-        echo "Please fill in all required fields";
+if (isset($_POST['login'])) {
+    $sql = "SELECT * FROM admin WHERE username = :u_uname AND password = :u_pwd";
+    $res = $pdo->prepare($sql);
+    $res->bindParam(':u_uname', $_POST['un']);
+    $res->bindParam(':u_pwd', $_POST['ps']);
+    $res->execute();
+    
+    if ($res->rowCount() == 1) {
+        header("Location: index2.php");
+        exit;
     } else {
-        $sql = "insert into student(studname,studphno,studgen,studbdate,studcourse,studemail,grno) values(:studname,:studphno,:studgen,:studbdate,:studcourse,:studemail,:grno)";
-        $rev = "insert into login (studemail,password) values(:studemail,:password)";
-        
-        $res1 = $pdo->prepare($rev);
-
-        $res = $pdo->prepare($sql);
-        
-        $res->bindParam(':studname', $_POST['studname']);
-        $res->bindParam(':studphno', $_POST['studphno']);
-        $res->bindParam(':studgen', $_POST['studgen']);
-        $res->bindParam(':studbdate', $_POST['studbdate']);
-        $res->bindParam(':studcourse', $_POST['studcourse']);
-        $res->bindParam(':grno', $_POST['grno']);
-        $res->bindParam(':studemail', $_POST['studemail']);
-        $res1->bindParam(':studemail', $_POST['studemail']);
-        $res1->bindParam(':password',$_POST['password']);
-        
-         
-        // execute prepare statement
-        if($res->execute()) {
-            echo "Data Inserted :)";
-            header("location:index.php?msg=Data Inserted!");
-            if($res1->execute()) {
-                echo "Data Inserted into login:)";
-                header("location:index.php?msg=Data Inserted!");
-            } else {
-                $error = $res1->errorInfo();
-                echo "Error inserting data into login: ".$error[2];
-            }
-        } else {
-            $error = $res->errorInfo();
-            echo "Error inserting data: ".$error[2];
-        }
-
-        // close connection
-        unset($pdo);
+        echo '<script>alert("Username and Password are Invalid");</script>';
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['studname'])) {
+    require_once "dbconnection.php";
+
+    $requiredFields = ['studname', 'studphno', 'studgen', 'studbdate', 'studcourse', 'studemail', 'grno', 'password'];
+    $allFieldsFilled = true;
+
+    foreach ($requiredFields as $field) {
+        if (empty($_POST[$field])) {
+            $allFieldsFilled = false;
+            break;
+        }
+    }
+
+    if (!$allFieldsFilled) {
+        echo "Please fill in all required fields";
+    } else {
+        try {
+            $pdo->beginTransaction();
+
+            
+            $sql = "INSERT INTO student (studname, studphno, studgen, studbdate, studcourse, studemail, grno) 
+                    VALUES (:studname, :studphno, :studgen, :studbdate, :studcourse, :studemail, :grno)";
+            $res = $pdo->prepare($sql);
+            $res->bindParam(':studname', $_POST['studname']);
+            $res->bindParam(':studphno', $_POST['studphno']);
+            $res->bindParam(':studgen', $_POST['studgen']);
+            $res->bindParam(':studbdate', $_POST['studbdate']);
+            $res->bindParam(':studcourse', $_POST['studcourse']);
+            $res->bindParam(':grno', $_POST['grno']);
+            $res->bindParam(':studemail', $_POST['studemail']);
+            $res->execute();
+
+           
+            $rev = "INSERT INTO login (studemail, password) VALUES (:studemail, :password)";
+            $res1 = $pdo->prepare($rev);
+            $res1->bindParam(':studemail', $_POST['studemail']);
+            $res1->bindParam(':password', $_POST['password']);
+            $res1->execute();
+
+            $pdo->commit();
+            echo "Data Inserted :)";
+            header("Location: index.php?msg=Data Inserted!");
+            exit;
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            echo "Error inserting data: " . $e->getMessage();
+        }
+    }
+}
+
+unset($pdo);
 ?>
 
 
