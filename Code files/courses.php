@@ -1,3 +1,22 @@
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "portal";
+
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sql = "SELECT course_name, course_code, no_of_seats, no_of_faculties, department FROM course";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+}
+?>
+
 <!DOCTYPE php>
 <php lang="en">
 <head>
@@ -16,7 +35,6 @@
                     <h1 class="m-0"><span class="text-primary">Academy</span>Site</h1>
                 </a>
             </div>
-            <!-- <div class="col-lg-3 text-right"> -->
             <div class="col-lg-3 text-right">
                 <div class="d-inline-flex align-items-center">
                     <i class="fa fa-2x fa-map-marker-alt text-primary mr-3"></i>
@@ -46,12 +64,11 @@
             </div>
         </div>
     </div>
-   
+
     <div class="container-fluid">
         <div class="row border-top px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
-            <a  class="btn btn-primary py-2 px-2 ml-auto d-none d-lg-block" href="admin_login.php">Login Admin</a>
-              
+                <a class="btn btn-primary py-2 px-2 ml-auto d-none d-lg-block" href="admin_login.php">Login Admin</a>
             </div>
             <div class="col-lg-9">
                 <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
@@ -77,7 +94,7 @@
             </div>
         </div>
     </div>
-    <!-- Navbar End -->
+
     <div class="container-fluid py-5">
         <div class="container py-5">
             <div class="text-center mb-5">
@@ -85,96 +102,36 @@
                 <h1>Courses</h1>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/course-1.jpg" alt="">
-                        <div class="bg-secondary p-4">
-                            <a class="h5" href="sub_course_1.php">B.E./B.Tech <br> Bachelor of Engineering/Technology</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>View details</h6>
-                                    <h5 class="m-0">Apply</h5>
+                <?php if (!empty($courses)): ?>
+                    <?php foreach ($courses as $course): ?>
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="rounded overflow-hidden mb-2">
+                                <img class="img-fluid" src="img/course-placeholder.jpg" alt="">
+                                <div class="bg-secondary p-4">
+                                    <a class="h5" href="#"><?= htmlspecialchars($course['course_name']) ?></a>
+                                    <p>Code: <?= htmlspecialchars($course['course_code']) ?></p>
+                                    <p>Seats: <?= htmlspecialchars($course['no_of_seats']) ?></p>
+                                    <p>Faculties: <?= htmlspecialchars($course['no_of_faculties']) ?></p>
+                                    <p>Department: <?= htmlspecialchars($course['department']) ?></p>
+                                    <div class="border-top mt-4 pt-4">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>View details</h6>
+                                            <h5 class="m-0">Apply</h5>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/course-2.jpg" alt="">
-                        <div class="bg-secondary p-4">
-                            <a class="h5" href="sub_course_2.php">B.Com <br> Bachelor of Commerce</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>View details</h6>
-                                    <h5 class="m-0">Apply</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/course-3.jpg" alt="">
-                        <div class="bg-secondary p-4">
-                            <a class="h5" href="sub_course_3.php">B.Sc<br> Bachelor of Science</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>View details</h6>
-                                    <h5 class="m-0">Apply</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/course-4.jpg" alt="">
-                        <div class="bg-secondary p-4">
-                            <a class="h5" href="sub_course_4.php">BBA<br> Bachelor of Business Administration</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>View details</h6>
-                                    <h5 class="m-0">Apply</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/course-5.jpg" alt="">
-                        <div class="bg-secondary p-4">
-                            <a class="h5" href="sub_course_5.php">BCA<br> Bachelor of Computer Applications</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>View details</h6>
-                                    <h5 class="m-0">Apply</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="img/Tablet.webp" alt="">
-                        <div class="bg-secondary p-4">
-                            <a class="h5" href="sub_course_6.php">B.Pharm<br> Bachelor of Pharmacy</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>View details</h6>
-                                    <h5 class="m-0">Apply</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-center">No courses available.</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
+
     <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(256, 256, 256, .1) !important;">
         <div class="row">
-            
             <div class="col-lg-6 text-center text-md-right">
                 <ul class="nav d-inline-flex">
                     <li class="nav-item">
@@ -193,7 +150,5 @@
             </div>
         </div>
     </div>
-    
-    
 </body>
 </php>
