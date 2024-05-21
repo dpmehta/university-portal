@@ -1,38 +1,51 @@
 <?php
-// Database configuration
-if($_SERVER['REQUEST_METHOD'] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once "dbconnection.php";
 
-// Prepare SQL query
-$sql = "INSERT INTO faculty (facultyid, name, gender, position, phone_num, teach_exp, date_dob, salary, branch, email_id) 
-		VALUES (:facultyid, :name, :gender, :position, :phone_num, :teach_exp, :date_dob, :salary, :branch, :email_id)";
-
-// Bind parameters to values submitted via form
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(':facultyid', $_POST['facultyid']);
-$stmt->bindParam(':name', $_POST['name']);
-$stmt->bindParam(':gender', $_POST['gender']);
-$stmt->bindParam(':position', $_POST['position']);
-$stmt->bindParam(':phone_num', $_POST['phone_num']);
-$stmt->bindParam(':teach_exp',$_POST['teach_exp']);
-$stmt->bindParam(':date_dob',$_POST['date_dob']);
-$stmt->bindParam(':salary',$_POST['salary']);
-$stmt->bindParam(':branch',$_POST['branch']);
-$stmt->bindParam(':email_id',$_POST['email_id']);
-
-if($stmt->execute()) {
-    echo "Data Inserted :)";
-    header("location:index.php?msg=Data Inserted!");
     
-} else {
-    $error = $stmt->errorInfo();
-    echo "Error inserting data: ".$error[2];
-}
+    $required_fields = ['facultyid', 'name', 'gender', 'position', 'phone_num', 'teach_exp', 'date_dob', 'salary', 'branch', 'email_id'];
+    foreach ($required_fields as $field) {
+        if (empty($_POST[$field])) {
+            die("Error: Missing required field $field");
+        }
+    }
 
-// close connection
-unset($pdo);
+    
+    $sql = "INSERT INTO faculty (facultyid, name, gender, position, phone_num, teach_exp, date_dob, salary, branch, email_id) 
+            VALUES (:facultyid, :name, :gender, :position, :phone_num, :teach_exp, :date_dob, :salary, :branch, :email_id)";
+    
+    try {
+        $stmt = $pdo->prepare($sql);
+
+        
+        $stmt->bindParam(':facultyid', $_POST['facultyid']);
+        $stmt->bindParam(':name', $_POST['name']);
+        $stmt->bindParam(':gender', $_POST['gender']);
+        $stmt->bindParam(':position', $_POST['position']);
+        $stmt->bindParam(':phone_num', $_POST['phone_num']);
+        $stmt->bindParam(':teach_exp', $_POST['teach_exp']);
+        $stmt->bindParam(':date_dob', $_POST['date_dob']);
+        $stmt->bindParam(':salary', $_POST['salary']);
+        $stmt->bindParam(':branch', $_POST['branch']);
+        $stmt->bindParam(':email_id', $_POST['email_id']);
+
+        
+        if ($stmt->execute()) {
+            echo "Data Inserted :)";
+            header("Location: index.php?msg=" . urlencode("Data Inserted!"));
+            exit();
+        } else {
+            $error = $stmt->errorInfo();
+            echo "Error inserting data: " . htmlspecialchars($error[2]);
+        }
+    } catch (PDOException $e) {
+        echo "Database error: " . htmlspecialchars($e->getMessage());
+    }
+
+    unset($pdo);
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
