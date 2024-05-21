@@ -11,7 +11,7 @@
 
     <link href="css/style.css" rel="stylesheet">
   <style>
-    /* Table styling */
+ 
     body{
         font-size: 18px;
     }
@@ -34,7 +34,6 @@
     tr:nth-child(even) {
       background-color: #f2f2f2;
     }
-    /* Input styling */
     input[type="text"], select {
       padding: 6px 10px;
       border: none;
@@ -53,7 +52,6 @@
   </style>
 </head>
 <body>
-      <!-- Topbar Start -->
       <div class="container-fluid d-none d-lg-block">
         <div class="row align-items-center py-4 px-xl-5">
             <div class="col-lg-3">
@@ -91,10 +89,6 @@
         
         </div>
     </div>
-    <!-- Topbar End -->
-
-
-    <!-- Navbar Start -->
     <div class="container-fluid">
         <div class="row border-top px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
@@ -125,8 +119,7 @@
             </div>
         </div>
     </div>
-    <!-- Navbar End -->
-
+    
 
   <br><br><br>
   <h2 style="color:black">Department under BPharm Courses</h2>
@@ -141,22 +134,41 @@
     </thead>
     <tbody>
     <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "portal";
-      $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-      $stmt = $conn->prepare("SELECT course_name, course_code, no_of_seats FROM course WHERE department = 'B.Pharm'");
-      $stmt->execute();
 
-      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo "<tr>";
-        echo "<td>" . $row['course_name'] . "</td>";
-        echo "<td>" . $row['course_code'] . "</td>";
-        echo "<td>" . $row['no_of_seats'] . "</td>";
-        echo "</tr>";
-      }
-    ?>
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "portal";
+
+try {
+  $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+  $sql = "SELECT course_name, course_code, no_of_seats FROM course WHERE department = 'B.Pharm'";
+  $stmt = $conn->prepare($sql);
+
+  $stmt->execute();
+
+  $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($courses) {
+    foreach ($courses as $row) {
+      echo "<tr><td>" . $row['course_name'] . "</td><td>" . $row['course_code'] . "</td><td>" . $row['no_of_seats'] . "</td></tr>";
+    }
+  } else {
+    echo "<tr><td colspan='3'>No courses found for B.Pharm</td></tr>";
+  }
+
+} catch(PDOException $e) {
+  echo "Error: " . $e->getMessage();
+} finally {
+  if ($conn) {
+    $conn = null;
+  }
+}
+
+?>
+
   </tbody>
 </table><br>
 <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(256, 256, 256, .1) !important;">
