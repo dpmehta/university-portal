@@ -1,53 +1,45 @@
 <?php
-$servername = "localhost"; 
-$username = "root"; 
-$password = ""; 
-$dbname = "portal"; 
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "portal";
+
 try {
-  
-  $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
- 
-  if (isset($_POST['submit'])) {
-     
-      $subject = $_POST['subject'];
-      $classnum = $_POST['classnum'];
-      $blocknum = $_POST['blocknum'];
-      $examtype = $_POST['examtype'];
-      $date_exam = $_POST['date_exam'];
+    if (isset($_POST['submit'])) {
+        $subject = trim($_POST['subject']);
+        $classnum = trim($_POST['classnum']);
+        $blocknum = trim($_POST['blocknum']);
+        $examtype = trim($_POST['examtype']);
+        $date_exam = trim($_POST['date_exam']);
 
-      
-      if (empty($date_exam) || empty($subject) || empty($classnum) || empty($blocknum) || empty($examtype)) {
-          echo "Please fill all the fields";
-      } else {
-          
-          $stmt = $conn->prepare("INSERT INTO examdetails (examSubject, classNumber, blockNo,date_exam, examType) VALUES (:subject, :classnum, :blocknum,:date_exam, :examtype)");
-          $stmt->bindParam(':date_exam', $date_exam);
-          $stmt->bindParam(':subject', $subject);
-          $stmt->bindParam(':classnum', $classnum);
-          $stmt->bindParam(':blocknum', $blocknum);
-          $stmt->bindParam(':examtype', $examtype);
-          $stmt->execute();
+        if (empty($date_exam) || empty($subject) || empty($classnum) || empty($blocknum) || empty($examtype)) {
+            echo "Please fill all the fields";
+        } else {
+            $stmt = $conn->prepare("INSERT INTO examdetails (examSubject, classNumber, blockNo, date_exam, examType) 
+                                    VALUES (:subject, :classnum, :blocknum, :date_exam, :examtype)");
+            $stmt->bindParam(':date_exam', $date_exam);
+            $stmt->bindParam(':subject', $subject);
+            $stmt->bindParam(':classnum', $classnum, PDO::PARAM_INT);
+            $stmt->bindParam(':blocknum', $blocknum, PDO::PARAM_INT);
+            $stmt->bindParam(':examtype', $examtype);
 
-         
-          if ($stmt->rowCount() > 0) {
-            echo '<script type ="text/JavaScript">';  
-            echo 'alert("Form Submitted")';  
-            echo '</script>';  
-          } else {
-              echo "Failed to submit the form";
-          }
-      }
-  }
-
-} catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
+            if ($stmt->execute()) {
+                echo '<script type="text/javascript">alert("Form Submitted");</script>';
+            } else {
+                echo "Failed to submit the form";
+            }
+        }
+    }
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+} finally {
+    $conn = null;
 }
-
-// Close the database connection
-$conn = null;
 ?>
+
 
 
 <!DOCTYPE html>
