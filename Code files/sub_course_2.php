@@ -12,7 +12,7 @@
     
     <link href="css/style.css" rel="stylesheet">
   <style>
-    /* Table styling */
+
     body{
         font-size: 18px;
     }
@@ -35,7 +35,6 @@
     tr:nth-child(even) {
       background-color: #f2f2f2;
     }
-    /* Input styling */
     input[type="text"], select {
       padding: 6px 10px;
       border: none;
@@ -142,20 +141,30 @@
     </thead>
     <tbody>
     <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "portal";
-      $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-      $stmt = $conn->prepare("SELECT course_name, course_code, no_of_seats FROM course WHERE department = 'B.Com'");
-      $stmt->execute();
-
-      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo "<tr>";
-        echo "<td>" . $row['course_name'] . "</td>";
-        echo "<td>" . $row['course_code'] . "</td>";
-        echo "<td>" . $row['no_of_seats'] . "</td>";
-        echo "</tr>";
+      $servername = "localhost";
+      $username = "root";
+      $password = "";
+      $dbname = "portal";
+      
+      try {
+          $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+          $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      
+          
+          $stmt = $conn->prepare("SELECT course_name, course_code, no_of_seats FROM course WHERE department = :department");
+          $department = 'B.Com';
+          $stmt->bindParam(':department', $department, PDO::PARAM_STR);
+      
+          $stmt->execute();
+          while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+              echo "<tr>";
+              echo "<td>" . htmlspecialchars($row['course_name'], ENT_QUOTES, 'UTF-8') . "</td>";
+              echo "<td>" . htmlspecialchars($row['course_code'], ENT_QUOTES, 'UTF-8') . "</td>";
+              echo "<td>" . htmlspecialchars($row['no_of_seats'], ENT_QUOTES, 'UTF-8') . "</td>";
+              echo "</tr>";
+          }
+      } catch (PDOException $e) {
+          echo "Connection failed: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
       }
     ?>
   </tbody>
