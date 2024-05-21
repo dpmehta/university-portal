@@ -1,9 +1,15 @@
 <?php
 
-$pdo = new PDO("mysql:host = localhost; dbname=portal", "root","");
+$dsn = "mysql:host=localhost;dbname=portal";
+$username = "root";
+$password = "";
 
-$pdo -> setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-
-echo "Connection Done!";
+try {
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "Connection successful!";
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+}
 
 ?>
