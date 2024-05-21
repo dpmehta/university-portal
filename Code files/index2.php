@@ -1,6 +1,5 @@
 <!DOCTYPE php>
 <php lang="en">
-
 <head>
 <style>
 		.container {
@@ -184,7 +183,6 @@
         </div>
     </div>
    
-    <!-- <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="fa fa-angle-double-up"></i></a> -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
     <script src="lib/easing/easing.min.js"></script>

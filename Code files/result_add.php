@@ -5,47 +5,49 @@ $password = "";
 $dbname = "portal";
 
 try {
-  $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-  if(isset($_POST['submit'])) {
-    $grno = $_POST['grno'];
-    $sem = $_POST['sem'];
-    $spi = $_POST['spi'];
-    $remarks = $_POST['remarks'];
-    $backlog = $_POST['backlog'];
+    if (isset($_POST['submit'])) {
+       
+        $required_fields = ['grno', 'sem', 'spi', 'remarks', 'backlog'];
+        foreach ($required_fields as $field) {
+            if (empty($_POST[$field])) {
+                die("Error: Missing required field $field");
+            }
+        }
 
-        $sql = "INSERT INTO result (grno, sem, spi, remarks,backlog) VALUES (:grno, :sem, :spi, :remarks,:backlog)";
+        $grno = $_POST['grno'];
+        $sem = $_POST['sem'];
+        $spi = $_POST['spi'];
+        $remarks = $_POST['remarks'];
+        $backlog = $_POST['backlog'];
+
+      
+        $sql = "INSERT INTO result (grno, sem, spi, remarks, backlog) VALUES (:grno, :sem, :spi, :remarks, :backlog)";
         $stmt = $conn->prepare($sql);
-        
-        $remarksValue = $remarks ? 1 : 0;
-        $stmt->bindParam(':remarks', $remarksValue, PDO::PARAM_INT); // bind as integer
 
+        
         $stmt->bindParam(':grno', $grno);
         $stmt->bindParam(':sem', $sem);
         $stmt->bindParam(':spi', $spi);
-        // $stmt->bindParam(':remarks', $remarks);
+        $stmt->bindParam(':remarks', $remarks);
         $stmt->bindParam(':backlog', $backlog);
-        $stmt->execute();
 
-        if ($stmt->rowCount()) {
-            echo '<script type ="text/JavaScript">';  
-            echo 'alert("result Added")';  
-            echo '</script>'; 
-            header('location:result_details.php') ;
+       
+        if ($stmt->execute()) {
+            echo '<script type="text/JavaScript">alert("Result Added");</script>';
+            header('Location: result_details.php');
+            exit();
         } else {
             echo "Failed to submit the form";
         }
-
     }
-
-    
-  
+} catch (PDOException $e) {
+    echo "Connection failed: " . htmlspecialchars($e->getMessage());
+} finally {
+    $conn = null;
 }
-catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
-}
-$conn = null;
 ?>
 
 <!DOCTYPE html>
